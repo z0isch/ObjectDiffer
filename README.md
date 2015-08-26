@@ -1,3 +1,4 @@
+[![NuGet version](https://badge.fury.io/nu/ObjectDiffer.svg)](http://badge.fury.io/nu/ObjectDiffer)
 # ObjectDiffer
 A class library for performing a diff of any 2 objects of the same type.
 
