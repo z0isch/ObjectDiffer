@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectDiffer.Test", "..\ObjectDiffer.Test\ObjectDiffer.Test.csproj", "{D2C23BD7-4DA3-4533-8747-B2D8A1F8F5AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectDiffer.Test", "ObjectDiffer.Test\ObjectDiffer.Test.csproj", "{D2C23BD7-4DA3-4533-8747-B2D8A1F8F5AF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectDiffer", "ObjectDiffer\ObjectDiffer.csproj", "{9E2B1813-57CD-4A7A-AAB5-77171D1F3AB0}"
 EndProject
