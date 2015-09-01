@@ -26,13 +26,11 @@ class MyObj
 public void DiffAList(){
   var differ = kernel.Get<IDiffer>();
   
-  var obj = new MyObj{ Id = 1, Name = "object"};
-  var oldList = new List<MyObj>{obj1, new MyObj{Id = 1337, Name = "another object"}};
-  // clone the old list
-  var newList = oldList.Select(x => x).ToList();
-  // move obj from the start of the old list to the end of the new one
-  newList.Remove(obj);
-  newList.Add(obj);
+  var obj1 = new MyObj{Id = 1, Name = "object"};
+  var obj2 = new MyObj{Id = 1337, Name = "another object"};
+
+  var oldList = new List<MyObj>{obj1, obj2};
+  var newList = new List<MyObj>{obj2, obj1}; //note that they are added in reverse order
 
   var diff = differ.Diff(newList, oldList);
   // we would expect the diff to be null, since the elements in the list are the same
