@@ -294,17 +294,5 @@ namespace ObjectDiffer.Test
             Assert.IsTrue(result.ChildDiffs.Any(d => d.NewValue is int && (int)d.NewValue == 4 && d.OldValue == null));
             Assert.IsTrue(result.ChildDiffs.Any(d => d.OldValue is int && (int)d.OldValue == 3 && d.NewValue == null));
         }
-
-        [Test]
-        public void ComparerToCheckIfObjectsShouldBeTheSameShouldBePluggable()
-        {
-            var comparer = Substitute.For<IEqualityComparer<object>>();
-            var kernel = new StandardKernel(new ObjectDifferModule());
-            kernel.Rebind<IEqualityComparer<object>>().ToConstant(comparer).Named("SameObjectComparer");
-            var differ = kernel.Get<IDiffer>();
-
-            var a = differ.Diff(new List<int> {1, 2, 3}, new List<int> {2, 3, 4});
-            comparer.Received().Equals(Arg.Any<object>(), Arg.Any<object>());
-        }
     }
 }
