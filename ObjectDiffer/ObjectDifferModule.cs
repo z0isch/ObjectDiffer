@@ -13,7 +13,7 @@ namespace ObjectDiffer
             Bind<ITypeDiffer>().To<EnumerableDiffer>();
 
             Bind<ITypeDiffer>().To<ObjectTypeDiffer>();
-            Bind<IEqualityComparer<object>>().To<HashCodeEqualityComparer>().Named("SameObjectComparer");
+            Bind<IEqualityComparer<object>>().To<DefaultEqualityComparer>().Named("SameObjectComparer");
 
             Bind<IDiffer>().To<Differ>();
         }

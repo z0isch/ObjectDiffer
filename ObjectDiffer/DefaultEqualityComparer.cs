@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ObjectDiffer
 {
-    public class HashCodeEqualityComparer : IEqualityComparer<object>
+    public class DefaultEqualityComparer : IEqualityComparer<object>
     {
         public bool Equals(object x, object y)
         {
-            return x.GetHashCode() == y.GetHashCode();
+            return Object.Equals(x, y);
         }
 
         public int GetHashCode(object obj)

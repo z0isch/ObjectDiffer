@@ -48,7 +48,7 @@
     <Compile Include="Differ.cs" />
     <Compile Include="Difference.cs" />
     <Compile Include="DifferFactory.cs" />
-    <Compile Include="HashCodeEqualityComparer.cs" />
+    <Compile Include="DefaultEqualityComparer.cs" />
     <Compile Include="IDiffer.cs" />
     <Compile Include="ObjectDifferModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
