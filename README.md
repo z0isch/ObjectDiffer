@@ -19,9 +19,7 @@ var differ = kernel.Get<IDiffer>();
 
 ## Notes
 
-1. The differ determines if 2 objects are equal using the `Equals` method, rather than reference equality.
-
-2. When the differ is diffing an array, it needs to determine which elements represent the same object in each list. For example:
+1. When the differ is diffing an array, it needs to determine which elements represent the same object in each list. For example:
 ```csharp
 class MyObj
 {
@@ -43,17 +41,17 @@ public void DiffAList(){
   // however, if the differ just compares the objects at each index of the array, it would think we have changed both elements
 }
 ```
-To solve this problem, the differ assumes that if the hash code of the objects are equal, they are supposed to be the same object. So in the example above, we would just add a `GetHashCode()` method to `MyObj`:
+To solve this problem, the differ assumes that if the hash code of the objects are equal, as determined by the `Object.Equals` method, they are supposed to be the same object. So in the example above, we would just add a `Equals` method to `MyObj`:
 ```csharp
 class MyObj
 {
     public int Id { get; set; }
     public string Name { get; set; }
     
-    public override int GetHashCode()
-    {
-        return Id;
-    }
+	public bool Equals(object x, object y)
+	{
+		return ((MyObj) x).Id == ((MyObj) y).Id;
+	}
 }
 ```
 If you would like to employ a different strategy for determining equality, you can override the equality comparer that the differ uses like so:
