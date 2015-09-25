@@ -11,7 +11,8 @@ namespace ObjectDiffer.TypeDiffers
 
         public Difference PerformDiff(object newObj, object oldObj, string propName, Type type, Func<object, object, string, Type, Difference> diffChildCallback)
         {
-            return Equals(newObj, oldObj) ? null : new Difference(propName, newObj, oldObj);
+            // "cast" both objects to dynamic so their actual types are determined at runtime, and the "==" operator works as expected
+            return ((dynamic) newObj) == ((dynamic) oldObj) ? null : new Difference(propName, newObj, oldObj);
         }
     }
 }
