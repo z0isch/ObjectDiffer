@@ -2,7 +2,13 @@
 # ObjectDiffer
 A class library for performing a diff of any 2 objects of the same type.
 
-The easiest way to use ObjectDiffer is by loading the `ObjectDifferModule` ninject module:
+You need to use an instance of `IDiffer` to perform the diff. The easiest way to get an instance of `IDiffer` is by using the `DifferFactory`:
+```csharp
+var factory = new DifferFactory();
+var differ = factory.GetDefault();
+```
+
+If you are using ninject, you can also load the `ObjectDifferModule` module:
 ```csharp
 var kernel = new StandardKernel(new ObjectDifferModule());
 // you can now inject an IDiffer into your classes, or get an instance directly:
