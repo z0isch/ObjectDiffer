@@ -19,5 +19,10 @@ namespace ObjectDiffer
         {
             return new Differ(typeDiffers);
         }
+
+        public IDiffer GetWithTypeDiffers(params ITypeDiffer[] typeDiffers)
+        {
+            return GetWithTypeDiffers(typeDiffers);
+        }
     }
 }
