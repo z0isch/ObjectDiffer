@@ -34,8 +34,11 @@ namespace ObjectDiffer.TypeDiffers
 
         protected abstract IEnumerable<Tuple<object, object>> GroupEqualObjects(IEnumerable<object> newArray, IEnumerable<object> oldArray);
 
-        private Type GetEnumerableElementType(Type enumerableType)
+        private Type GetEnumerableElementType(Type type)
         {
+            var enumerableType = type.GetInterfaces()
+                .Union(type.IsInterface ? new List<Type> { type } : Enumerable.Empty<Type>())
+                .First(i => i.IsGenericType && i.GenericTypeArguments.Count() == 1 && typeof (IEnumerable).IsAssignableFrom(i));
             return enumerableType.GetGenericArguments().First();
         }
     }

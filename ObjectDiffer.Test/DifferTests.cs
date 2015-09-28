@@ -356,6 +356,32 @@ namespace ObjectDiffer.Test
             Assert.IsTrue(diff.ChildDiffs.Any(d => d.NewValue == obj1 && d.OldValue == obj2));
             Assert.IsTrue(diff.ChildDiffs.Any(d => d.NewValue == obj2 && d.OldValue == obj1));
         }
+
+        [Test]
+        public void ShouldIgnoreKeysWhenDiffingDictionaryByDefault()
+        {
+            // key value pairs are not necessarily equal if keys are equal
+            var oldDict = new Dictionary<int, string> {{1, "old"}};
+            var newDict = new Dictionary<int, string> {{1, "new"}};
+
+            var diff = _differ.Diff(newDict, oldDict);
+
+            Assert.AreEqual(2, diff.ChildDiffs.Count());
+            Assert.IsTrue(diff.ChildDiffs.Any(d =>
+            {
+                if (d.NewValue == null)
+                    return false;
+                var kvp = ((KeyValuePair<int, string>) d.NewValue);
+                return kvp.Key == 1 && kvp.Value == "new" && d.OldValue == null;
+            }));
+            Assert.IsTrue(diff.ChildDiffs.Any(d =>
+            {
+                if (d.OldValue == null)
+                    return false;
+                var kvp = ((KeyValuePair<int, string>)d.OldValue);
+                return kvp.Key == 1 && kvp.Value == "old" && d.NewValue == null;
+            }));
+        }
     }
 
     [TestFixture]
