@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ObjectDiffer.TypeDiffers
 {
-    class IndexEnumerableDiffer : EnumerableDiffer
+    public class IndexEnumerableDiffer : EnumerableDiffer
     {
         protected override IEnumerable<Tuple<object, object>> GroupEqualObjects(IEnumerable<object> newArray, IEnumerable<object> oldArray)
         {

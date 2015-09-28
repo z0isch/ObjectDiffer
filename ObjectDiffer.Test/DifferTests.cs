@@ -12,12 +12,12 @@ namespace ObjectDiffer.Test
     {
         private IDiffer _differ;
 
-        protected abstract IDiffer GetDiffer();
+        protected abstract IDiffer GetDiffer(bool useIndexEnumerableDiffer);
 
         [SetUp]
         public void Setup()
         {
-            _differ = GetDiffer();
+            _differ = GetDiffer(false);
         }
 
         private class TestObj
@@ -295,14 +295,75 @@ namespace ObjectDiffer.Test
             Assert.IsTrue(result.ChildDiffs.Any(d => d.NewValue is int && (int) d.NewValue == 4 && d.OldValue == null));
             Assert.IsTrue(result.ChildDiffs.Any(d => d.OldValue is int && (int) d.OldValue == 3 && d.NewValue == null));
         }
+
+        [Test]
+        public void DifferShouldDiffArraysByObjectEqualityByDefault()
+        {
+            IEnumerable<TestObj> array = new List<TestObj>
+            {
+                new TestObj
+                {
+                    Id = 1
+                },
+                new TestObj
+                {
+                    Id = 2
+                }
+            };
+
+            var diff = _differ.Diff(array, array.Reverse());
+
+            Assert.IsNull(diff);
+        }
+
+
+        [Test]
+        public void DifferShouldDiffPrimativeArrayElementsByIndexWhenUsingIndexEnumerableDiffer()
+        {
+            var differ = GetDiffer(true);
+            var oldArray = new List<int> {1, 2, 3};
+            var newArray = new List<int> {1, 2, 4};
+
+            var diff = differ.Diff(newArray, oldArray);
+
+            Assert.AreEqual(1, diff.ChildDiffs.Count());
+            var childDiff = diff.ChildDiffs.First();
+            Assert.AreEqual(3, childDiff.OldValue);
+            Assert.AreEqual(4, childDiff.NewValue);
+        }
+
+        [Test]
+        public void DifferShouldDiffObjectArrayElementsByIndexWhenUsingIndexEnumerableDiffer()
+        {
+            var differ = GetDiffer(true);
+            var obj1 = new TestObj
+            {
+                Id = 1
+            };
+            var obj2 = new TestObj
+            {
+                Id = 2
+            };
+            IEnumerable<TestObj> array = new List<TestObj>
+            {
+                obj1, obj2
+            };
+
+            // should return 2 child diffs, one for each array element, even though the elements in each array are equal
+            var diff = differ.Diff(array, array.Reverse());
+
+            Assert.AreEqual(2, diff.ChildDiffs.Count());
+            Assert.IsTrue(diff.ChildDiffs.Any(d => d.NewValue == obj1 && d.OldValue == obj2));
+            Assert.IsTrue(diff.ChildDiffs.Any(d => d.NewValue == obj2 && d.OldValue == obj1));
+        }
     }
 
     [TestFixture]
     public class NinjectDifferTests : DifferTests
     {
-        protected override IDiffer GetDiffer()
+        protected override IDiffer GetDiffer(bool useIndexEnumerableDiffer)
         {
-            var kernel = new StandardKernel(new ObjectDifferModule());
+            var kernel = new StandardKernel(new ObjectDifferModule(useIndexEnumerableDiffer));
             return kernel.Get<IDiffer>();
         }
     }
@@ -310,22 +371,22 @@ namespace ObjectDiffer.Test
     [TestFixture]
     public class FactoryDifferTests : DifferTests
     {
-        protected override IDiffer GetDiffer()
+        protected override IDiffer GetDiffer(bool useIndexEnumerableDiffer)
         {
-            return new DifferFactory().GetDefault();
+            return new DifferFactory().GetDefault(useIndexEnumerableDiffer);
         }
     }
 
     [TestFixture]
     public class ManuallyCreatedDifferTests : DifferTests
     {
-        protected override IDiffer GetDiffer()
+        protected override IDiffer GetDiffer(bool useIndexEnumerableDiffer)
         {
             return new Differ(
                 new List<ITypeDiffer>
                 {
                     new PrimativeDiffer(),
-                    new ObjectEqualityEnumerableDiffer(new DefaultEqualityComparer()),
+                    useIndexEnumerableDiffer ? (ITypeDiffer)new IndexEnumerableDiffer() : new ObjectEqualityEnumerableDiffer(new DefaultEqualityComparer()),
                     new ObjectTypeDiffer()
                 });
         }
