@@ -5,12 +5,12 @@ namespace ObjectDiffer
 {
     public class DifferFactory
     {
-        public IDiffer GetDefault()
+        public IDiffer GetDefault(bool diffEnumerablesByIndex = false)
         {
             return new Differ(new List<ITypeDiffer>
             {
                 new PrimativeDiffer(),
-                new ObjectEqualityEnumerableDiffer(new DefaultEqualityComparer()),
+                diffEnumerablesByIndex ? (ITypeDiffer)new IndexEnumerableDiffer() : new ObjectEqualityEnumerableDiffer(new DefaultEqualityComparer()),
                 new ObjectTypeDiffer()
             });
         }
