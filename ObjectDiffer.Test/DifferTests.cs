@@ -4,19 +4,20 @@ using System.Linq;
 using Ninject;
 using NSubstitute;
 using NUnit.Framework;
+using ObjectDiffer.TypeDiffers;
 
 namespace ObjectDiffer.Test
 {
-    [TestFixture]
-    public class DifferTests
+    public abstract class DifferTests
     {
         private IDiffer _differ;
+
+        protected abstract IDiffer GetDiffer(bool useIndexEnumerableDiffer);
 
         [SetUp]
         public void Setup()
         {
-            var kernel = new StandardKernel(new ObjectDifferModule());
-            _differ = kernel.Get<IDiffer>();
+            _differ = GetDiffer(false);
         }
 
         private class TestObj
@@ -24,7 +25,7 @@ namespace ObjectDiffer.Test
             public int Id { get; set; }
             public string Primative { get; set; }
             public TestObj Object { get; set; }
-            public List<TestObj> List { get; set; } 
+            public List<TestObj> List { get; set; }
 
             public override bool Equals(object obj)
             {
@@ -57,7 +58,7 @@ namespace ObjectDiffer.Test
         [Test]
         public void RootDiffObjectShouldShowDifferencesInRootObject()
         {
-            var diff =_differ.Diff("A", "B");
+            var diff = _differ.Diff("A", "B");
             Assert.AreEqual("self", diff.PropertyName);
             Assert.AreEqual("A", diff.NewValue);
             Assert.AreEqual("B", diff.OldValue);
@@ -99,7 +100,7 @@ namespace ObjectDiffer.Test
                     Primative = "Val1"
                 }
             };
-            var newObj  = new TestObj
+            var newObj = new TestObj
             {
                 Object = new TestObj
                 {
@@ -205,7 +206,7 @@ namespace ObjectDiffer.Test
         public void ShouldDiffArraysWhenNull()
         {
             List<string> old = null;
-            var newList = new List<string> { "a" };
+            var newList = new List<string> {"a"};
 
             var diff = _differ.Diff(newList, old);
             Assert.IsNotNull(diff);
@@ -290,9 +291,104 @@ namespace ObjectDiffer.Test
         {
             // The differ doesn't know the 3 in the old list and the 4 in the new list are supposed to be the same.
             // Should return 2 child diffs, one for adding the 4 and one for removing the 3
-            var result = _differ.Diff(new List<int> { 1, 2, 4 }, new List<int> { 1, 2, 3 });
-            Assert.IsTrue(result.ChildDiffs.Any(d => d.NewValue is int && (int)d.NewValue == 4 && d.OldValue == null));
-            Assert.IsTrue(result.ChildDiffs.Any(d => d.OldValue is int && (int)d.OldValue == 3 && d.NewValue == null));
+            var result = _differ.Diff(new List<int> {1, 2, 4}, new List<int> {1, 2, 3});
+            Assert.IsTrue(result.ChildDiffs.Any(d => d.NewValue is int && (int) d.NewValue == 4 && d.OldValue == null));
+            Assert.IsTrue(result.ChildDiffs.Any(d => d.OldValue is int && (int) d.OldValue == 3 && d.NewValue == null));
+        }
+
+        [Test]
+        public void DifferShouldDiffArraysByObjectEqualityByDefault()
+        {
+            IEnumerable<TestObj> array = new List<TestObj>
+            {
+                new TestObj
+                {
+                    Id = 1
+                },
+                new TestObj
+                {
+                    Id = 2
+                }
+            };
+
+            var diff = _differ.Diff(array, array.Reverse());
+
+            Assert.IsNull(diff);
+        }
+
+
+        [Test]
+        public void DifferShouldDiffPrimativeArrayElementsByIndexWhenUsingIndexEnumerableDiffer()
+        {
+            var differ = GetDiffer(true);
+            var oldArray = new List<int> {1, 2, 3};
+            var newArray = new List<int> {1, 2, 4};
+
+            var diff = differ.Diff(newArray, oldArray);
+
+            Assert.AreEqual(1, diff.ChildDiffs.Count());
+            var childDiff = diff.ChildDiffs.First();
+            Assert.AreEqual(3, childDiff.OldValue);
+            Assert.AreEqual(4, childDiff.NewValue);
+        }
+
+        [Test]
+        public void DifferShouldDiffObjectArrayElementsByIndexWhenUsingIndexEnumerableDiffer()
+        {
+            var differ = GetDiffer(true);
+            var obj1 = new TestObj
+            {
+                Id = 1
+            };
+            var obj2 = new TestObj
+            {
+                Id = 2
+            };
+            IEnumerable<TestObj> array = new List<TestObj>
+            {
+                obj1, obj2
+            };
+
+            // should return 2 child diffs, one for each array element, even though the elements in each array are equal
+            var diff = differ.Diff(array, array.Reverse());
+
+            Assert.AreEqual(2, diff.ChildDiffs.Count());
+            Assert.IsTrue(diff.ChildDiffs.Any(d => d.NewValue == obj1 && d.OldValue == obj2));
+            Assert.IsTrue(diff.ChildDiffs.Any(d => d.NewValue == obj2 && d.OldValue == obj1));
+        }
+    }
+
+    [TestFixture]
+    public class NinjectDifferTests : DifferTests
+    {
+        protected override IDiffer GetDiffer(bool useIndexEnumerableDiffer)
+        {
+            var kernel = new StandardKernel(new ObjectDifferModule(useIndexEnumerableDiffer));
+            return kernel.Get<IDiffer>();
+        }
+    }
+
+    [TestFixture]
+    public class FactoryDifferTests : DifferTests
+    {
+        protected override IDiffer GetDiffer(bool useIndexEnumerableDiffer)
+        {
+            return new DifferFactory().GetDefault(useIndexEnumerableDiffer);
+        }
+    }
+
+    [TestFixture]
+    public class ManuallyCreatedDifferTests : DifferTests
+    {
+        protected override IDiffer GetDiffer(bool useIndexEnumerableDiffer)
+        {
+            return new Differ(
+                new List<ITypeDiffer>
+                {
+                    new PrimativeDiffer(),
+                    useIndexEnumerableDiffer ? (ITypeDiffer)new IndexEnumerableDiffer() : new ObjectEqualityEnumerableDiffer(new DefaultEqualityComparer()),
+                    new ObjectTypeDiffer()
+                });
         }
     }
 }
