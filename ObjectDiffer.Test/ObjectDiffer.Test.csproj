@@ -59,6 +59,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="DifferenceTests.cs" />
     <Compile Include="DifferFactoryTests.cs" />
     <Compile Include="DifferTests.cs" />
     <Compile Include="IoCTests.cs" />

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace ObjectDiffer
 {
@@ -20,6 +22,17 @@ namespace ObjectDiffer
         public Difference this[string name]
         {
             get { return this.ChildDiffs.FirstOrDefault(d => d.PropertyName == name); }
-        } 
+        }
+
+        public Difference Filter(Predicate<Difference> filter)
+        {
+            if (!filter(this)) return null;
+
+            var diff = new Difference(this.PropertyName, this.NewValue, this.OldValue)
+            {
+                ChildDiffs = this.ChildDiffs?.Select(d => d.Filter(filter)).Where(d => d != null)
+            };
+            return diff.ChildDiffs == null || diff.ChildDiffs.Any() ? diff : null;
+        }
     }
 }
