@@ -19,7 +19,19 @@ var differ = kernel.Get<IDiffer>();
 
 ## Notes
 
-1. When the differ is diffing an array, it needs to determine which elements represent the same object in each list. For example:
+1. The differ can diff arrays in 2 different ways, either by looking at the element at each index in the array, or by the equality of objects in the array. You can determine which strategy to use in either the `DifferFactory` or the `ObjectDifferModule`:
+```csharp
+bool diffByIndex = true;
+
+// using factory
+var factory = new DifferFactory();
+var differ = factory.GetDefault(diffByIndex);
+
+// using ninject
+var kernel = new StandardKernel(new ObjectDifferModule(diffByIndex));
+differ = kernel.Get<IDiffer>();
+```
+2. When the differ is diffing an array by object equality, it needs a way to determine which elements represent the same object in each list. For example:
 ```csharp
 class MyObj
 {
