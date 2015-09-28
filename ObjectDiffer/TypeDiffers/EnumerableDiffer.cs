@@ -7,15 +7,8 @@ using Ninject;
 
 namespace ObjectDiffer.TypeDiffers
 {
-    public class EnumerableDiffer : ITypeDiffer
+    public abstract class EnumerableDiffer : ITypeDiffer
     {
-        private readonly IEqualityComparer<object> _sameObjectComparer;
-
-        public EnumerableDiffer([Named("SameObjectComparer")]IEqualityComparer<object> sameObjectComparer)
-        {
-            _sameObjectComparer = sameObjectComparer;
-        }
-
         public bool CanPerformDiff(Type t)
         {
             return typeof (IEnumerable).IsAssignableFrom(t) && t.IsGenericType;
@@ -28,21 +21,18 @@ namespace ObjectDiffer.TypeDiffers
 
             var parentDifference = new Difference(propName, newObj, oldObj)
             {
-                ChildDiffs = newArray.Union(oldArray).Distinct(_sameObjectComparer)
-                    .Select(elem => new
-                    {
-                        newItem = newArray.FirstOrDefault(x => _sameObjectComparer.Equals(x, elem)),
-                        oldItem = oldArray.FirstOrDefault(x => _sameObjectComparer.Equals(x, elem))
-                    })
+                ChildDiffs = GroupEqualObjects(newArray, oldArray)
                     .Select(
                         change =>
-                            diffChildCallback(change.newItem, change.oldItem, "Item", GetEnumerableElementType(type)))
+                            diffChildCallback(change.Item1, change.Item2, "Item", GetEnumerableElementType(type)))
                     .Where(d => d != null)
                     .ToList()
             };
             // assume arrays are the same if there are no child differences
             return parentDifference.ChildDiffs.Any() ? parentDifference : null;
         }
+
+        protected abstract IEnumerable<Tuple<object, object>> GroupEqualObjects(IEnumerable<object> newArray, IEnumerable<object> oldArray);
 
         private Type GetEnumerableElementType(Type enumerableType)
         {

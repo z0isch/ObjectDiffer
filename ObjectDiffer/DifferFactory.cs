@@ -10,7 +10,7 @@ namespace ObjectDiffer
             return new Differ(new List<ITypeDiffer>
             {
                 new PrimativeDiffer(),
-                new EnumerableDiffer(new DefaultEqualityComparer()),
+                new ObjectEqualityEnumerableDiffer(new DefaultEqualityComparer()),
                 new ObjectTypeDiffer()
             });
         }

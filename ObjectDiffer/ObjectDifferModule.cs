@@ -10,7 +10,7 @@ namespace ObjectDiffer
         public override void Load()
         {
             Bind<ITypeDiffer>().To<PrimativeDiffer>();
-            Bind<ITypeDiffer>().To<EnumerableDiffer>();
+            Bind<ITypeDiffer>().To<ObjectEqualityEnumerableDiffer>();
 
             Bind<ITypeDiffer>().To<ObjectTypeDiffer>();
             Bind<IEqualityComparer<object>>().To<DefaultEqualityComparer>().Named("SameObjectComparer");
