@@ -134,7 +134,7 @@ namespace ObjectDiffer.Test
             var oldChildObj = new TestObj
             {
                 Id = 1,
-                Primative = "A"
+                Primative = "ABC"
             };
             var old = new List<TestObj>
             {
@@ -143,7 +143,7 @@ namespace ObjectDiffer.Test
             var newChildObj = new TestObj
             {
                 Id = 1,
-                Primative = "B"
+                Primative = "DEF"
             };
             var newObj = new List<TestObj>
             {
@@ -381,6 +381,18 @@ namespace ObjectDiffer.Test
                 var kvp = ((KeyValuePair<int, string>)d.OldValue);
                 return kvp.Key == 1 && kvp.Value == "old" && d.NewValue == null;
             }));
+        }
+
+        [Test]
+        public void ShouldDiffDateTimeObjectsCorrectly()
+        {
+            var dt1 = new DateTime(2015, 1, 2);
+            var dt2 = new DateTime(2015, 1, 1);
+
+            var diff = _differ.Diff(dt1, dt2);
+
+            Assert.AreEqual(dt1, diff.NewValue);
+            Assert.AreEqual(dt2, diff.OldValue);
         }
     }
 

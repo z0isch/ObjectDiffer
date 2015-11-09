@@ -2,12 +2,13 @@
 
 namespace ObjectDiffer.TypeDiffers
 {
-    // used for diffing primatives, and structs/objects that should be treated as primatives (e.g. strings)
+    // used for diffing primatives, and structs/objects that should be treated as primatives
     public class PrimativeDiffer : ITypeDiffer
     {
         public bool CanPerformDiff(Type t)
         {
-            return t.IsPrimitive || t == typeof (string) || t == typeof(DateTime);
+            return t.IsPrimitive 
+                || t == typeof(DateTime); // treat DateTime's as primatives, because the "Date" property has a circular reference to itself, which causes a stack overflow
         }
 
         public Difference PerformDiff(object newObj, object oldObj, string propName, Type type, Func<object, object, string, Type, Difference> diffChildCallback)

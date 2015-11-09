@@ -9,7 +9,7 @@ namespace ObjectDiffer.TypeDiffers
     {
         public bool CanPerformDiff(Type t)
         {
-            return typeof (IEnumerable).IsAssignableFrom(t) && t.IsGenericType;
+            return typeof (IEnumerable).IsAssignableFrom(t);
         }
 
         public Difference PerformDiff(object newObj, object oldObj, string propName, Type type, Func<object, object, string, Type, Difference> diffChildCallback)
