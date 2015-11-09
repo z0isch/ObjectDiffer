@@ -15,7 +15,9 @@ var kernel = new StandardKernel(new ObjectDifferModule());
 var differ = kernel.Get<IDiffer>();
 ```
 
-`IDiffer` has only one method, `Diff<T>(T newObj, T oldObj)`. This returns a `Difference` object, or `null` if there is no difference. `Difference` has a property `ChildDiffs` which is a list of `Difference` objects representing the changes to child properties. It also contains the `PropertyName` ("self" for the top level object, and "Item" for items in an array), the `NewValue` and the `OldValue`. 
+`IDiffer` has only one method, `Diff<T>(T newObj, T oldObj)`. This returns a `Difference` object, or `null` if there is no difference. `Difference` has a property `ChildDiffs` which is a list of `Difference` objects representing the changes to child properties. It also contains the `PropertyName` ("self" for the top level object, and "Item" for items in an array), the `NewValue` and the `OldValue`.
+
+The `Difference` class has a method called `Filter`, which returns a `Difference` with only the child differences that meet the provided predicate. If the parent `Difference` does not pass the filter, `null` is returned. 
 
 ## Notes
 

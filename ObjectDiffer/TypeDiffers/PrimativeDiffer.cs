@@ -2,6 +2,7 @@
 
 namespace ObjectDiffer.TypeDiffers
 {
+    // used for diffing primatives, and structs/objects that should be treated as primatives (e.g. strings)
     public class PrimativeDiffer : ITypeDiffer
     {
         public bool CanPerformDiff(Type t)

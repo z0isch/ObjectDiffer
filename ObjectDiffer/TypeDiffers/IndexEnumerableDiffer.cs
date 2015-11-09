@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ObjectDiffer.TypeDiffers
 {
+    // diffs 2 enumerables based on the element at each index
     public class IndexEnumerableDiffer : EnumerableDiffer
     {
         protected override IEnumerable<Tuple<object, object>> GroupEqualObjects(IEnumerable<object> newArray, IEnumerable<object> oldArray)

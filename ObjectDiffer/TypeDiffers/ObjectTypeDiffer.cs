@@ -4,10 +4,12 @@ using System.Reflection;
 
 namespace ObjectDiffer.TypeDiffers
 {
+    // diffs any 2 objects based on their public properties
     public class ObjectTypeDiffer : ITypeDiffer
     {
         public bool CanPerformDiff(Type t)
         {
+            // can perform diff on anything
             return true;
         }
 

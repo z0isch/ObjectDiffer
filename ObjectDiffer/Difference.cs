@@ -19,11 +19,14 @@ namespace ObjectDiffer
             this.OldValue = oldVal;
         }
 
+        // syntactic sugar for getting a child diff. Each child diff should have a unique name
         public Difference this[string name]
         {
             get { return this.ChildDiffs.FirstOrDefault(d => d.PropertyName == name); }
         }
 
+        // Filters the ChildDiffs based on a predicate
+        // Returns null if the Difference it is called on does not pass the predicate
         public Difference Filter(Predicate<Difference> filter)
         {
             if (!filter(this)) return null;
