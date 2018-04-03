@@ -8,6 +8,7 @@ namespace ObjectDiffer.TypeDiffers
         public bool CanPerformDiff(Type t)
         {
             return t.IsPrimitive 
+                || t.IsEnum
                 || t == typeof(DateTime); // treat DateTime's as primatives, because the "Date" property has a circular reference to itself, which causes a stack overflow
         }
 

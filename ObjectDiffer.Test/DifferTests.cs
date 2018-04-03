@@ -40,7 +40,7 @@ namespace ObjectDiffer.Test
                 return Id;
             }
         }
-
+        private enum TestEnum { A,B}
         [Test]
         public void PropertyDifferenceIndexerShouldReturnChildDiffWithMatchingPropertyName()
         {
@@ -393,6 +393,13 @@ namespace ObjectDiffer.Test
 
             Assert.AreEqual(dt1, diff.NewValue);
             Assert.AreEqual(dt2, diff.OldValue);
+        }
+
+        [Test]
+        public void ShouldDiffEnumsCorrectly()
+        {
+            Assert.IsNull(_differ.Diff(TestEnum.A, TestEnum.A));
+            Assert.IsNotNull(_differ.Diff(TestEnum.A, TestEnum.B));
         }
     }
 
